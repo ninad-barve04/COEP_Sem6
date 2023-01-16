@@ -5,9 +5,10 @@
 
 int main() {
 	int pid = fork();
+	char *arr[] = {"ls", "-lRa", NULL};
 	if (pid == 0) {
 		printf("I'm childish\n");
-		execlp("rm", "rm", "-i","shell", NULL);
+		execv("/bin/ls", arr);
 	} else {
 		printf("I'm the parent\n");
 	}

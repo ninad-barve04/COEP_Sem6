@@ -21,72 +21,85 @@
 int main()
 {
     char buffer[1024], cwd[64], prompt[64];
+    char *args[1024];
     char *temp;
     int pid;
     int custom = 0;
     int len;
+    int status = 1;
     
-    while (1) {
+    char PATH[]="/usr/bin/";
+
+    while (status) {
+        /*for displaying the prompt if it is the cwd or a custom one*/
         if (custom == 0) {
             getcwd(cwd, 64);
             strcpy(prompt, cwd);
-            printf("%s%s%s ", C_GREEN, cwd, C_RESET);
+            printf("%s%s%s$ ", C_GREEN, cwd, C_RESET);
         } else {
-            printf("%s%s%s ", C_GREEN, prompt, C_RESET);
+            printf("%s%s%s$ ", C_GREEN, prompt, C_RESET);
         }
-        
-        scanf("%s", buffer);
+        /*Getting the user command shell*/
+        fgets(buffer, 1024, stdin);
+        buffer[strlen(buffer)-1] = '\0';
 
+        /*setting the custom prompt*/
         if (strstr(buffer, "PS1") != NULL) {
             temp = &(buffer[5]);
             strcpy(prompt, temp);
             len = strlen(prompt);
             prompt[len-1] = '\0';
-            custom = 1;
+            if (strcmp(prompt, "\\w$") == 0) {
+                custom = 0;
+            } else {
+                custom = 1;
+            }
             printf("PS1=%s\n",temp);
-            // free(temp);
             continue;
         }
-
-        // switch (buffer[0]) {
-        //     case KEY_UP:
-        //         printf("UP\n");
-        //         break;
-        //     case KEY_DOWN:
-        //         printf("DOWN\n");
-        //         break;
-        //     case KEY_LEFT:
-        //         printf("LEFT\n");
-        //         break;
-        //     case KEY_RIGHT:
-        //         printf("RIGHT\n");
-        //         break;
-        //     default:
-        //         break;
-        // }
-        
-        if (strcmp(buffer, "exit") == 0) {
+        /*Gracefully exiting the shell*/
+        else if (strcmp(buffer, "exit") == 0) {
             printf("Exitting Gracefully!!\n");
-            exit(0);
+            status = 0;
             break;
         }
-        
-        if (strcmp(buffer, "cd") == 0) {
+        /*handling changing directory*/
+        else if (strstr(buffer, "cd") != NULL) {
+            temp = &(buffer[3]);
             char path[64];
-            scanf("%s", path);
+            strcpy(path, temp);
             int c = chdir(path);
             continue;
-        }
-
-        pid = fork();
-        if (pid == 0) {
-            execlp(buffer, buffer, NULL);
         } else {
-            if (strcmp(buffer, "exit") == 0) {
-                exit(0);
-                break;
+            /*adding PATH to the command*/
+            temp = (char *)malloc(strlen(PATH));
+            strcpy(temp, PATH);
+            strcat(temp, buffer);
+            strcpy(buffer, temp);
+            free(temp);
+            // printf("Command = %s\n", buffer);
+
+            /*Now creating an argument array for execv syscall*/
+            char *p = strtok(buffer, " ");
+            int i = 0;
+            while (p != NULL) {
+                args[i++] = p;
+                p = strtok(NULL, " ");
             }
-            wait(0);
+            args[i] = NULL;
+
+            pid = fork();
+            if (pid == 0) {
+                execv(buffer, args);
+            } else {
+                if (strcmp(buffer, "exit") == 0) {
+                    // exit(0);
+                    // break;
+                    status = 0;
+                } 
+                wait(0);
+                
+            }
         }
     }
     return 0;
