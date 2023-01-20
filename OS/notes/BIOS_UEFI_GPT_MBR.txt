@@ -1,0 +1,31 @@
+1. BIOS:
+    Basic IO System
+    Kept inside ROM
+    Used for managing device hardware outside the kernel
+    Outside means when kernel is only in HDD yet
+    Selects a device into which we have to boot
+    USB, Optical, SSD, HDD might be the order
+    Has its own IVT and all for managing Keyboard
+    16-bit environment
+2. UEFI:
+    Unified Extensible Firmware Interface
+    Very nice device management in place of BIOS
+    Replacement of BIOS
+    More features
+    Nice GUI
+    Some can detect mouse
+    32-bit??
+3. GPT:
+    GUID Partition Table
+        Globally Unique Identifier
+    Used alongwith UEFI
+    Standard for layout of partitions on a disk
+    
+4. MBR:
+    A boot sector at the beginnig of disk
+        The very first 512 bytes of the storage is MBR
+    4 Primary partitions allowed
+    Last, ie. 4th can be a Extended partition
+        Inside extended partitions, we can have multiple Logical partitions
+    
+    

@@ -5,7 +5,7 @@
 
 int main() {
 	int pid = fork();
-	char *arr[] = {"ls", "-lRa", NULL};
+	char *arr[] = {"ls", "-lRa", NULL, "hello"};
 	if (pid == 0) {
 		printf("I'm childish\n");
 		execv("/bin/ls", arr);
