@@ -1,0 +1,109 @@
+Memory management
+Backbone of the OS
+
+Collective work of CPU, Kernel, Compiler, linker, loader etc.
+
+eg.
+1000:
+    mov 3000, $20
+    add r1, r1, 1
+    jmp 3020
+Addresses issued in address bus are:
+1000->3000->1004->1008->3020
+Memory layout of the C program
+
+int a[16];
+int b = 20;
+int main(int argc, char *argv[]) {
+    int x, *p;
+    p = malloc(30);
+    x = 30;
+}
+########See diagram in notebook and add in tablet########
+a goes to uninitialized data
+b goes to initialized data
+x in stack
+p in stack
+size malloced to p in heap
+the code data in text
+
+
+In executable file:
+1. text:
+        code for malloc and x = 30
+2. initialized data
+3. info about bss
+No heap and stack in executable
+    Needed only when the code is running!!
+HW: Use objdump to see where data is present in executable
+
+$ size /usr/bin/ls
+Gives size of executable
+
+
+What is DESIRED??:
+    A] multitasking system
+        multiple programs in RAM at a time & scheduled one after other
+        How will the programs be accommodated in the RAM
+    B] isolation and protection among processes from one other
+    C] Code of a process need not be at a fixed location
+    D] one process need not be contiguous
+        All the parts of a program need not be side by side
+
+
+:::::Timing::::::
+A] compile time
+$ cc a.c -o a
+B] load time
+$ ./a
+C] run time
+when the program is executing
+
+Binding
+    -- of a variable or code to a memory location
+    -- determining where a variable gets stored in physical memory
+    -- three types
+        > compile time binding: memory decided on compiling
+                                rigid handling
+        > load time binding   : memory decided on doing ./a.out
+                                flexible can check where we have space and then give
+        > run time binding    : memory decided on the fly while execution has started
+                                flexible
+
+::::Simplest case::::
+There is no Memory management unit
+
+> Now address issued by CPU is present in the code
+> Therfore code must have physical addresses
+> This means compiler must know and fix the physical address in the machine code it generates
+> Compiler will fix the location for code, data, etc.
+> The code is not "relocatable". It goes to a fixed location in RAM
+> Here we have a compile time binding decided by the CPU
+> Big Problem:
+    No MultiProgramming possible
+    Compiler cannot know other programs present in the RAM
+    As compiler decides the memory address, on execution old data if present in that location was deleted
+    THIS IS THE WORLD OF "DOS". Only 1 CPU, 1 Kernel and 1 RAM
+
+
+::::Base relocation scheme::::
+CPU has a MMU
+The mmu translates the address to available tru addresses
+
+> One scheme in MMU is base+relocation/limit register
+  MMU has 2 registers: base, relocation
+  Some logic done to them
+  
+> Compiler sees the programs as one continuous chunk in RAM starting at addr 0
+> Compiler will fix addressesof ll program & generated code
+> At load time
+  
+
+
+
+
+
+
+
+
+
