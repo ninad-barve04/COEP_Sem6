@@ -112,7 +112,7 @@ int main()
             temp = &(buffer[3]);
             strcpy(path, temp);
             if (strlen(path) == 0) {
-                strcpy(path, "/home/ninad");
+                strcpy(path, getenv("HOME"));
             }
             int c = chdir(path);
             if (c < 0) {

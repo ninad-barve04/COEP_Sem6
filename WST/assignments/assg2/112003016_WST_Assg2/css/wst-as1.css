@@ -1,0 +1,280 @@
+@font-face {
+    font-family: 'Lato Regular';
+    src: url('../fonts/Lato-Regular.woff2') format('woff2'),
+         url('../fonts/Lato-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+@font-face {
+    font-family: 'Hack Zero Regular';
+    src: url('../fonts/Hack-ZeroSlash-Regular.woff2') format('woff2'),
+         url('../fonts/Hack-ZeroSlash-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+.w-body{
+    font-family: "Lato", Helvetica, Arial, sans-serif;
+    background-color: #fff;
+}
+.w-navbar {
+    position:fixed;
+    top:0;
+    width: 100%;
+    height:40px;
+    display:block;
+    background-color: black;
+    z-index: 50;
+}
+.w-navbar-left{
+    align-items: center;
+    width:33%;
+    display: block;
+    float:left;
+}
+.w-navbar-center{
+    align-items: center;
+    display:block;
+    width:33%;
+    float:left;
+    text-align: center;
+    margin-top: 5px;
+}
+.w-navbar-right{
+    align-items: center;
+    margin-top:5px;
+    float:right;
+}
+.w-search-bar{
+    background-color: rgb(0, 0, 0);
+    color: white;
+    margin-left: 20px;
+    width:100%;
+    border: 1px solid grey;
+    margin-top:5px;
+}
+.w-button-menu{
+    margin-right: 30px;
+    background-color: black;
+    color:white;
+    border:1px solid white;
+    width:90px;
+    font-family: Hack Zero Regular, sans-serif;
+
+}
+
+.w-button-c1{
+    border: 3px solid #f1ac32;
+    background-image: linear-gradient(#fecc4c,#ffac33);
+    background-color: #feac32;
+    color:#0a0a23;
+}
+.w-button-signin{
+    margin-right: 30px;
+    width:120px;
+    font-family: Hack Zero Regular, sans-serif;
+}
+
+.w-button-getstarted{
+    margin-right: 30px;
+    width:420px;
+    height:60px;
+    font-size:20px;
+}
+
+.w-button-certs{
+    text-align: left;
+    text-decoration-color: blue;
+    width:80%;
+    height:80px;
+    font-size:20px;
+    border:3px solid black;
+    background-color: #e6e6e6;
+    margin-top:10px;
+}
+.w-button-certs:hover{
+    text-align: left;
+    width:80%;
+    height:80px;
+    font-size:20px;
+    border:3px solid black;
+    background-color: black;
+    color:#e6e6e6;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+.w-button-certs p{
+   
+    font-family: Hack Zero Regular, sans-serif;
+}
+
+.w-spacer{
+    height:50px;
+}
+
+
+
+.w-content{
+    margin-top:80px;
+    display:block;
+}
+
+.w-heading{
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 40px;
+    font-family: Lato Regular, sans-serif;
+    letter-spacing:2px;
+    font-size:45px;
+}
+
+.w-text1
+{
+    font-family: Lato Regular, sans-serif;
+    font-size:22.5px;
+    font-weight: 700;
+}
+.w-text2
+{
+    font-family: Lato Regular, sans-serif;
+    font-size:1.5rem;
+}
+.w-text3
+{
+    font-family: Lato Regular, sans-serif;
+    font-size:1.3rem;
+}
+
+.w-logos
+{
+    height:40px;
+    justify-content:space-evenly;
+    display:flex;
+    margin:10px 0;
+}
+
+
+.w-as-seen{
+    padding:4vw 0;
+    background-color: rgba(32, 32, 70, 0.73);
+}
+
+.w-footer{
+    font-family: Lato Regular, sans-serif;
+    padding:4vw 0;
+    background-color: #e6e6e6;
+    font-size:16px;
+    line-height: 30px;
+}
+
+.w-footer a{
+    text-decoration: none;
+    color:black;
+}
+.w-footer a:hover{
+    text-decoration: underline;
+    color:black;
+}
+
+
+.w-as-seen .w-heading{
+    color:#d0d0d5
+}
+
+.w-testimonials
+{
+    padding:4vw 0;
+}
+
+.w-list{
+    list-style: none;
+    width:100%;
+}
+
+.w-list-item{
+    text-align: center;
+}
+
+.w-button-certs svg{
+    min-height: 20px;
+    min-width: 16px;
+    height: 40px;
+    margin-inline-start: 15px;
+    margin-top:10px;
+    margin-right:20px;
+    float:left;
+}
+
+.w-button-certs:hover svg{
+    min-height: 20px;
+    min-width: 16px;
+    height: 40px;
+    margin-inline-start: 15px;
+    margin-top:10px;
+    margin-right:20px;
+    float:left;
+    fill:#e6e6e6;
+}
+
+.w-button-certs p{
+    float:left;
+    margin-top:10px;
+}
+
+.w-footer-col1{
+    float:left;
+    width:45%;
+    padding:5px;
+}
+.w-footer-col2{
+    float:left;
+    width:55%;
+}
+
+.w-footer-note
+{
+    justify-content:space-evenly;
+    display:flex;
+}
+
+.w-footer-line
+{
+    background-color: darkgray;
+    height:2px;
+    margin: 0 15px;
+}
+
+.w-margin-15
+{
+    margin:0px 25% 0px 25%;
+    text-align: center;
+}
+
+.w-button-loginopt{
+    text-align: left;
+    width:50%;
+    height:50px;
+    font-size:20px;
+    border:3px solid black;
+    background-color: #e6e6e6;
+    margin-top:10px;
+    font-family: Hack Zero Regular, sans-serif;
+}
+
+.w-button-loginopt2{
+    text-align: left;
+    width:20%;
+    height:50px;
+    font-size:20px;
+    border:3px solid black;
+    background-color: #e6e6e6;
+    margin-top:25px;
+    font-family: Hack Zero Regular, sans-serif;
+}
+
+a:visited{color: red;}

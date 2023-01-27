@@ -322,11 +322,12 @@ int check_path(char **patharr, int path_count, char *cmd) {
  *        They are ' ' and '\t'
  * 
  * @param dest Destination string with whitespace characters removed
+ *             this should not be malloced
  * @param src  Original string from input
  */
 void remove_leading_and_trailing_space(char *dest, char *src) {
     int idx = 0, k = 0;
-
+    dest = (char *)malloc(strlen(src));
     while (src[idx] == ' ' || src[idx] == '\t') {
         idx++;
     }
@@ -366,22 +367,24 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
     count++;
     // printf("Count %d\n", count);
     int pfdarray[count - 1][2];
-    // for (int k = 0; k < count-1; k++) {
-    //     pipe(pfdarray[k]);
-    // }
+    for (int k = 0; k < count-1; k++) {
+        pipe(pfdarray[k]);
+    }
     char **cmd_array = (char **)malloc(count);
+    for (int m = 0; m < count; m++) {
+        /*make null*/
+    }
     char *p = strtok(buffer, "|");
     i = 0;
     while (p != NULL) {
+        // remove_leading_and_trailing_space(cmd_array[i], p);
         cmd_array[i] = p;
         i++;
         p = strtok(NULL, "|");
     }
 
     for (i = 0; i < count; i++) {
-        for (int k = 0; k < count-1; k++) {
-            pipe(pfdarray[k]);
-        }
+        printf("cmd_Array[i]: %s\n", cmd_array[i]);
         /**
          * in first iteration i = 0;
          *      close(1) write closed
@@ -394,29 +397,9 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
          *      dup(pipe array ke x ka 1)
          * in last iteration
          *      close(0)
-         *      dup(pipe array ke x ka 0)
+         *      dup(pipe array ke x-1 ka 0)
          */
         /*Checking for redirection*/
-
-        if (i == 0) {
-            close(1);
-            dup(pfdarray[i][1]);            
-        }
-        else if (i == count - 1) {
-            close(0);
-            dup(pfdarray[i][0]);
-            printf("In last command\n");
-        } else {
-            close(0);
-            dup(pfdarray[i-1][0]);
-            close(1);
-            dup(pfdarray[i][1]);
-        }
-
-        for (int m = 0; m < count; m++) {
-            close(pfdarray[m][0]);
-            close(pfdarray[m][1]);
-        }
 
 
         if (strstr(cmd_array[i], "<") != NULL) {
@@ -462,13 +445,33 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
             if (temp[len-1] != '/') {
                 strcat(temp, "/");
             }
-            strcat(temp, buffer);
+            strcat(temp, cmd_array[i]);
             strcpy(cmd, temp);
             free(temp);
         }
-
+        printf("cmd: %s\n", cmd);
         pid = fork();
         if (pid == 0) {
+            if (i == 0) {
+                close(1);
+                dup(pfdarray[i][1]);
+            }
+            else if (i == count - 1) {
+                close(0);
+                dup(pfdarray[i-1][0]);
+                printf("In last command\n%s\n", cmd);
+            } else {
+                close(0);
+                dup(pfdarray[i-1][0]);
+                close(1);
+                dup(pfdarray[i][1]);
+            }
+
+            for (int m = 0; m < count; m++) {
+                close(pfdarray[m][0]);
+                close(pfdarray[m][1]);
+            }
+
             execv(cmd, args);
         } else {
             for (int m = 0; m < count; m++) {

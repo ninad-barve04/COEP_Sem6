@@ -8,9 +8,6 @@
  * 
  */
 
-
-//USE FUNCTIONS AS MUCH AS POSSIBLE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -36,12 +33,10 @@
 #define ORA 4 /*Output Redirection with Append*/
 
 #define BUFFERSIZE 1024
-#define MICROBUFFER 16
 
 /*Utility function declarations*/
 int check_path(char **patharr, int path_count, char *cmd);
 void remove_leading_and_trailing_space(char *dest, char *src);
-void execute_pipe(char *input, char *PATHS[], int path_count);
 
 
 int main()
@@ -49,13 +44,14 @@ int main()
     /*various char arrays to be used to store different strings*/
     char buffer[BUFFERSIZE], cwd[BUFFERSIZE], prompt[BUFFERSIZE], path[BUFFERSIZE], redfile[BUFFERSIZE], cmd[BUFFERSIZE];
     char *args[BUFFERSIZE]; /*argument array. All commands get split at whitespace*/
-    char *history[MICROBUFFER];
     char *temp; /*char pointer for all temporary storing purposes*/
     int pid; /*process id of child and parent*/
     int custom = 0; /*custom prompt flag*/
     int len;
     int status = 1; /*staus flag for exiting out of loop*/
     int red_flag = NOR; /*redirection flag*/
+    int pipe_flag = 0; /*pipe present in command*/\
+    int pfd[2]; /*pipe file descriptors array*/
     
     char *PATHS[64], PATH[BUFFERSIZE];
     PATHS[0]="/usr/bin/";
@@ -67,6 +63,7 @@ int main()
     printf("%s%sWARNING%s: Default path set to /usr/bin. Adding new paths via PATH=newpath1:newpath2:... will delete existing paths\n", C_RED, BOLD, RESET);
 
     while (status) {
+        pipe_flag = 0;
         /*for displaying the prompt if it is the cwd or a custom one*/
         if (custom == 0) {
             getcwd(cwd, BUFFERSIZE);
@@ -89,9 +86,6 @@ int main()
         remove_leading_and_trailing_space(buffer, temp);
         free(temp);
 
-        for (int m = 0; m < MICROBUFFER; m++) {
-
-        }
         
         /*Following is the set of if, else if and else conditions handling the shell*/
 
@@ -106,7 +100,7 @@ int main()
             } else {
                 custom = 1;
             }
-            printf("PS1=\"%s\n",temp);
+            printf("PS1=%s\n",temp);
             continue;
         }
         /*Gracefully exiting the shell*/
@@ -120,8 +114,7 @@ int main()
             temp = &(buffer[3]);
             strcpy(path, temp);
             if (strlen(path) == 0) {
-                strcpy(path, getenv("HOME"));
-                // strcpy(path, "/home/ninad");
+                strcpy(path, "/home/ninad");
             }
             int c = chdir(path);
             if (c < 0) {
@@ -167,9 +160,6 @@ int main()
             }
             printf("\n");
         }
-        else if (strcmp(buffer, "history") == 0) {
-             
-        }
         /*No special commands. Proceed to normal execution*/
         else {
             /*checking existence of any paths*/
@@ -181,13 +171,13 @@ int main()
             }
             /*adding PATH to the command*/
             else {
-                /*Checking presence of pipe character*/
+                /*Check for pipes*/
                 if (strstr(buffer, "|") != NULL) {
-                    /*Pipe handler function call*/
-                    printf("Executing pipe\n");
-                    execute_pipe(buffer, PATHS, path_count);
-                    continue;
+                    pipe_flag = 1;
+                    pipe(pfd);
+                    printf("Pipe detected\n");
                 }
+                
                 /*Checking for redirection*/
                 if (strstr(buffer, "<") != NULL) {
                     red_flag = IPR;
@@ -344,141 +334,4 @@ void remove_leading_and_trailing_space(char *dest, char *src) {
         l--;
     }
     return;
-}
-
-void execute_pipe(char *input, char *PATHS[], int path_count) {
-    /*If we are inside here, it means we already have a presence pf pipe here*/
-    /*strtok modifies the string so copying input to a separate buffer*/
-    char *buffer = strdup(input);
-    char *args[BUFFERSIZE];
-    char redfile[BUFFERSIZE], cmd[BUFFERSIZE];
-    char *temp;
-    int red_flag = NOR, len = 0;
-    int pid;
-    /*count no of commands*/
-    int count = 0, i = 0;
-    while (buffer[i] != '\0') {
-        if (buffer[i] == '|') {
-            count++;
-        }
-        i++;
-    }
-    count++;
-    // printf("Count %d\n", count);
-    int pfdarray[count - 1][2];
-    // for (int k = 0; k < count-1; k++) {
-    //     pipe(pfdarray[k]);
-    // }
-    char **cmd_array = (char **)malloc(count);
-    char *p = strtok(buffer, "|");
-    i = 0;
-    while (p != NULL) {
-        cmd_array[i] = p;
-        i++;
-        p = strtok(NULL, "|");
-    }
-
-    for (i = 0; i < count; i++) {
-        for (int k = 0; k < count-1; k++) {
-            pipe(pfdarray[k]);
-        }
-        /**
-         * in first iteration i = 0;
-         *      close(1) write closed
-         *      dup(pipe ka 0 ka 1)
-         * in all middle iterations
-         *      curr itr = x
-         *      close(0)
-         *      dup(pipe array ke x-1 ka 0)
-         *      close(1)
-         *      dup(pipe array ke x ka 1)
-         * in last iteration
-         *      close(0)
-         *      dup(pipe array ke x ka 0)
-         */
-        /*Checking for redirection*/
-
-        if (i == 0) {
-            close(1);
-            dup(pfdarray[i][1]);            
-        }
-        else if (i == count - 1) {
-            close(0);
-            dup(pfdarray[i][0]);
-            printf("In last command\n");
-        } else {
-            close(0);
-            dup(pfdarray[i-1][0]);
-            close(1);
-            dup(pfdarray[i][1]);
-        }
-
-        for (int m = 0; m < count; m++) {
-            close(pfdarray[m][0]);
-            close(pfdarray[m][1]);
-        }
-
-
-        if (strstr(cmd_array[i], "<") != NULL) {
-            red_flag = IPR;
-        } else if (strstr(cmd_array[i], ">") != NULL) {
-            if (strstr(cmd_array[i], ">>") != NULL) {
-                red_flag = ORA;
-            } else {
-                red_flag = OPR;
-            }
-        } else {
-            red_flag = NOR;
-        }
-
-
-        /*Now creating an argument array for handling options*/
-        char *p = strtok(cmd_array[i], " ");
-        int i = 0, idx;
-        while (p != NULL) {
-            args[i++] = p;
-            p = strtok(NULL, " ");
-            if (p != NULL && (strcmp(p, ">") == 0 || strcmp(p, ">>") == 0 || strcmp(p, "<") == 0)) {
-                p = strtok(NULL, " ");
-                strcpy(redfile, p);
-                break;
-            }
-        }
-        args[i] = NULL;
-
-        /*Checking path is command exists*/
-        int path_idx = check_path(PATHS, path_count, cmd_array[i]);
-        if (path_idx == -1) {
-            printf("%s%sError%s: Invalid command: %s\n", C_RED, BOLD, RESET, cmd_array[i]);
-            continue;
-        }
-        /*User has provided complete path to command*/
-        else if (path_idx == -2) {
-            strcpy(cmd, cmd_array[i]);
-        } else {
-            temp = (char *)malloc(strlen(PATHS[path_idx]));
-            strcpy(temp, PATHS[path_idx]);
-            len = strlen(temp);
-            if (temp[len-1] != '/') {
-                strcat(temp, "/");
-            }
-            strcat(temp, buffer);
-            strcpy(cmd, temp);
-            free(temp);
-        }
-
-        pid = fork();
-        if (pid == 0) {
-            execv(cmd, args);
-        } else {
-            for (int m = 0; m < count; m++) {
-                wait(0);
-            }
-        }
-
-    }
-
-
-
-    free(buffer);
 }
