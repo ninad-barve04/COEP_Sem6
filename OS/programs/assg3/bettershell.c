@@ -49,7 +49,8 @@ int main()
     /*various char arrays to be used to store different strings*/
     char buffer[BUFFERSIZE], cwd[BUFFERSIZE], prompt[BUFFERSIZE], path[BUFFERSIZE], redfile[BUFFERSIZE], cmd[BUFFERSIZE];
     char *args[BUFFERSIZE]; /*argument array. All commands get split at whitespace*/
-    char *history[MICROBUFFER];
+    char *history[BUFFERSIZE];
+    int hist_count;
     char *temp; /*char pointer for all temporary storing purposes*/
     int pid; /*process id of child and parent*/
     int custom = 0; /*custom prompt flag*/
@@ -89,9 +90,7 @@ int main()
         remove_leading_and_trailing_space(buffer, temp);
         free(temp);
 
-        for (int m = 0; m < MICROBUFFER; m++) {
-
-        }
+        history[hist_count++] = buffer;
         
         /*Following is the set of if, else if and else conditions handling the shell*/
 
@@ -168,7 +167,9 @@ int main()
             printf("\n");
         }
         else if (strcmp(buffer, "history") == 0) {
-             
+            for (int h = 0; h < hist_count; h++) {
+                printf("%d\t%s\n", h, history[h]);
+            }
         }
         /*No special commands. Proceed to normal execution*/
         else {
@@ -184,7 +185,9 @@ int main()
                 /*Checking presence of pipe character*/
                 if (strstr(buffer, "|") != NULL) {
                     /*Pipe handler function call*/
-                    printf("Executing pipe\n");
+                    execute_pipe(buffer, PATHS, path_count);
+                    continue;
+                } else {
                     execute_pipe(buffer, PATHS, path_count);
                     continue;
                 }
@@ -475,10 +478,10 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
             
             execv(cmd, args);
         } else {
-            // for (int m = 0; m < count; m++) {
+            for (int m = 0; m < count; m++) {
                 printf("Waiting for %d, cmd = %s\n", pid, cmd);
                 wait(0);
-            // }
+            }
         }
 
     }
