@@ -384,7 +384,7 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
     }
 
     for (i = 0; i < count; i++) {
-        printf("cmd_Array[i]: %s\n", cmd_array[i]);
+        // printf("cmd_Array[i]: %s\n", cmd_array[i]);
         /**
          * in first iteration i = 0;
          *      close(1) write closed
@@ -416,10 +416,10 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
 
 
         /*Now creating an argument array for handling options*/
-        char *p = strtok(cmd_array[i], " ");
-        int i = 0, idx;
+        p = strtok(cmd_array[i], " ");
+        int k = 0, idx;
         while (p != NULL) {
-            args[i++] = p;
+            args[k++] = p;
             p = strtok(NULL, " ");
             if (p != NULL && (strcmp(p, ">") == 0 || strcmp(p, ">>") == 0 || strcmp(p, "<") == 0)) {
                 p = strtok(NULL, " ");
@@ -427,7 +427,7 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
                 break;
             }
         }
-        args[i] = NULL;
+        args[k] = NULL;
 
         /*Checking path is command exists*/
         int path_idx = check_path(PATHS, path_count, cmd_array[i]);
@@ -449,9 +449,10 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
             strcpy(cmd, temp);
             free(temp);
         }
-        printf("cmd: %s\n", cmd);
+        // printf("%d cmd: %s\n", i, cmd);
         pid = fork();
         if (pid == 0) {
+            printf("%d cmd inside fork(): %s\n", i, cmd);
             if (i == 0) {
                 close(1);
                 dup(pfdarray[i][1]);
@@ -459,7 +460,7 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
             else if (i == count - 1) {
                 close(0);
                 dup(pfdarray[i-1][0]);
-                printf("In last command\n%s\n", cmd);
+                // printf("In last command\n%s\n", cmd);
             } else {
                 close(0);
                 dup(pfdarray[i-1][0]);
@@ -471,12 +472,13 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
                 close(pfdarray[m][0]);
                 close(pfdarray[m][1]);
             }
-
+            
             execv(cmd, args);
         } else {
-            for (int m = 0; m < count; m++) {
+            // for (int m = 0; m < count; m++) {
+                printf("Waiting for %d, cmd = %s\n", pid, cmd);
                 wait(0);
-            }
+            // }
         }
 
     }
