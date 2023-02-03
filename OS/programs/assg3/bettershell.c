@@ -402,9 +402,8 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
          *      close(0)
          *      dup(pipe array ke x-1 ka 0)
          */
+
         /*Checking for redirection*/
-
-
         if (strstr(cmd_array[i], "<") != NULL) {
             red_flag = IPR;
         } else if (strstr(cmd_array[i], ">") != NULL) {
@@ -452,6 +451,7 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
             strcpy(cmd, temp);
             free(temp);
         }
+        
         // printf("%d cmd: %s\n", i, cmd);
         pid = fork();
         if (pid == 0) {
