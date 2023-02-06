@@ -1,0 +1,48 @@
+.w-body {
+     
+    background-color: #fff;
+}
+
+.w-heading {
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 40px;
+    font-family: Tahoma, sans-serif;
+    letter-spacing: 2px;
+    font-size: 45px;
+}
+
+.w-fwd-button {
+    border: none;
+    color: #FFFFFF;
+    left: 76%;
+    position: fixed;
+    top: 40vh;
+    cursor: pointer;
+}
+
+.w-rev-button {
+    border: none;
+    color: #FFFFFF;
+    left: 20%;
+    position: fixed;
+    top: 40vh;
+    cursor: pointer;
+}
+
+
+.w-image {
+    width: 600px;
+}
+
+.w-controls {
+    justify-content: space-evenly;
+    display: flex;
+    margin: 10px 0;
+}
+
+.w-spacer{
+    height:30px;
+}
+
+

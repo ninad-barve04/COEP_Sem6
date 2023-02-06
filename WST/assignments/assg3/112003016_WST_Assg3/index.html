@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Image Gallery... </title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="./favicon-32x32.png" type="image/png">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/wst-assg3.css">
+</head>
+
+<body class="w-body" onload="initialize()">
+
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2 col-lg-2 col-sm-2"></div>
+                <div class="col-lg-8 col-md-8 text-center">
+                    <h2 class="w-heading">Image Gallery</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 col-lg-2 col-sm-2"></div>
+                <div class="col-lg-8 col-md-8">
+                    <div class="w-controls">
+                        <div>
+                            Auto Scroll
+                            <input class="ml-2" type="checkbox" onchange="setAutoScroll(this.checked)" checked >
+                        </div>
+                        <div>Select Time Delay<select class="form-select ml-2" aria-label="Time Delay"
+                                onchange="setTimeDelay(this.value)">
+                                <option selected value="5">5s</option>
+                                <option value="10">10s</option>
+                                <option value="15">15s</option>
+                                <option value="20">20s</option>
+                            </select></div>
+                        <div>Select Gallery<select class="form-select ml-2" aria-label="Time Delay"
+                            onchange="setGallery(this.value)">
+                            <option selected value="wildlife">Wildlife</option>
+                            <option value="monuments">Monuments</option>
+                            <option value="forts">Forts</option>
+                            
+                        </select></div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-lg-2 col-sm-2"></div>
+    
+            </div>
+            <div class="w-spacer"></div>
+            <div class="row">
+                
+                <div class="col-lg-12 col-md-12">
+
+                    <div class="text-center">
+                        <div class="w-rev-button" onclick="prevImage()">
+                            <image width="40px" src="./images/prev.png" />
+                        </div>
+                        <div class="w-fwd-button" onclick="nextImage()">
+                            <image width="40px" src="./images/fwd.png" />
+                        </div>
+                        
+                        <img class="w-image" id="imgplace" src="./images/image1.jpg" />
+                    </div>
+                </div>
+                
+
+            </div>
+            <div class="w-spacer">
+            </div>
+        </div>
+       
+    </div>
+
+
+    <div class="w-spacer"></div>
+
+    </div>
+
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/wst-assg3.js"></script>
+</body>
+
+</html>
