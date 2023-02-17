@@ -1,0 +1,69 @@
+Common subdirectories: linux-5.16.1/arch and Downloads/linux-5.16.1/arch
+Common subdirectories: linux-5.16.1/block and Downloads/linux-5.16.1/block
+Common subdirectories: linux-5.16.1/certs and Downloads/linux-5.16.1/certs
+Only in linux-5.16.1/: .config
+Only in linux-5.16.1/: .config.old
+Common subdirectories: linux-5.16.1/crypto and Downloads/linux-5.16.1/crypto
+Common subdirectories: linux-5.16.1/Documentation and Downloads/linux-5.16.1/Documentation
+Common subdirectories: linux-5.16.1/drivers and Downloads/linux-5.16.1/drivers
+Common subdirectories: linux-5.16.1/fs and Downloads/linux-5.16.1/fs
+Only in linux-5.16.1/: hello
+Common subdirectories: linux-5.16.1/include and Downloads/linux-5.16.1/include
+Common subdirectories: linux-5.16.1/init and Downloads/linux-5.16.1/init
+Common subdirectories: linux-5.16.1/ipc and Downloads/linux-5.16.1/ipc
+Common subdirectories: linux-5.16.1/kernel and Downloads/linux-5.16.1/kernel
+Common subdirectories: linux-5.16.1/lib and Downloads/linux-5.16.1/lib
+Common subdirectories: linux-5.16.1/LICENSES and Downloads/linux-5.16.1/LICENSES
+diff -c linux-5.16.1/Makefile Downloads/linux-5.16.1/Makefile
+*** linux-5.16.1/Makefile	2023-02-07 23:36:11.615213101 +0530
+--- Downloads/linux-5.16.1/Makefile	2022-01-16 13:41:15.000000000 +0530
+***************
+*** 1092,1098 ****
+  export MODULES_NSDEPS := $(extmod_prefix)modules.nsdeps
+  
+  ifeq ($(KBUILD_EXTMOD),)
+! core-y			+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/ hello/ pid_ancestry/
+  core-$(CONFIG_BLOCK)	+= block/
+  
+  vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, \
+--- 1092,1098 ----
+  export MODULES_NSDEPS := $(extmod_prefix)modules.nsdeps
+  
+  ifeq ($(KBUILD_EXTMOD),)
+! core-y			+= kernel/ certs/ mm/ fs/ ipc/ security/ crypto/
+  core-$(CONFIG_BLOCK)	+= block/
+  
+  vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, \
+Only in linux-5.16.1/: .missing-syscalls.d
+Common subdirectories: linux-5.16.1/mm and Downloads/linux-5.16.1/mm
+Only in linux-5.16.1/: modules.builtin
+Only in linux-5.16.1/: modules.builtin.modinfo
+Only in linux-5.16.1/: modules-only.symvers
+Only in linux-5.16.1/: .modules-only.symvers.cmd
+Only in linux-5.16.1/: modules.order
+Only in linux-5.16.1/: .modules.order.cmd
+Only in linux-5.16.1/: Module.symvers
+Only in linux-5.16.1/: .Module.symvers.cmd
+Common subdirectories: linux-5.16.1/net and Downloads/linux-5.16.1/net
+Only in linux-5.16.1/: pid_ancestry
+Common subdirectories: linux-5.16.1/samples and Downloads/linux-5.16.1/samples
+Common subdirectories: linux-5.16.1/scripts and Downloads/linux-5.16.1/scripts
+Common subdirectories: linux-5.16.1/security and Downloads/linux-5.16.1/security
+Common subdirectories: linux-5.16.1/sound and Downloads/linux-5.16.1/sound
+Only in linux-5.16.1/: System.map
+Only in linux-5.16.1/: .tmp_System.map
+Only in linux-5.16.1/: .tmp_vmlinux.kallsyms1
+Only in linux-5.16.1/: .tmp_vmlinux.kallsyms1.o
+Only in linux-5.16.1/: .tmp_vmlinux.kallsyms1.S
+Only in linux-5.16.1/: .tmp_vmlinux.kallsyms2
+Only in linux-5.16.1/: .tmp_vmlinux.kallsyms2.o
+Only in linux-5.16.1/: .tmp_vmlinux.kallsyms2.S
+Common subdirectories: linux-5.16.1/tools and Downloads/linux-5.16.1/tools
+Common subdirectories: linux-5.16.1/usr and Downloads/linux-5.16.1/usr
+Only in linux-5.16.1/: .version
+Common subdirectories: linux-5.16.1/virt and Downloads/linux-5.16.1/virt
+Only in linux-5.16.1/: vmlinux
+Only in linux-5.16.1/: .vmlinux.cmd
+Only in linux-5.16.1/: vmlinux-gdb.py
+Only in linux-5.16.1/: vmlinux.o
+Only in linux-5.16.1/: vmlinux.symvers
