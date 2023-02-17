@@ -1,4 +1,6 @@
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char const *argv[])
 {
@@ -33,8 +35,111 @@ int main(int argc, char const *argv[])
     // } else {
     //     wait(0);
     // }
-    char *str = "  -123";
-    int a = atoi(str);
-    printf("%d\n", a);
+    // char *str = "  -123";
+    // int a = atoi(str);
+    // printf("%d\n", a);
+    
+    typedef struct JobList {
+        int pid;
+        char *jobname;
+        struct JobList *next;
+    } JobList;
+
+    JobList *joblist = NULL;
+    
+    JobList *nn = (JobList *)malloc(sizeof(JobList));
+    nn->jobname = strdup("hello");
+    nn->pid = 20;
+    nn->next = NULL;
+    JobList *temp = joblist;
+    if (temp == NULL) {
+        joblist = nn;
+    } else {
+        while (temp->next != NULL) {
+            temp = temp->next;
+        } 
+        temp->next = nn;
+    }
+
+    nn = (JobList *)malloc(sizeof(JobList));
+    nn->jobname = strdup("what");
+    nn->pid = 10;
+    nn->next = NULL;
+    temp = joblist;
+    if (temp == NULL) {
+        joblist = nn;
+    } else {
+        while (temp->next != NULL) {
+            temp = temp->next;
+        } 
+        temp->next = nn;
+    }
+
+    nn = (JobList *)malloc(sizeof(JobList));
+    nn->jobname = strdup("there there");
+    nn->pid = 33;
+    nn->next = NULL;
+    temp = joblist;
+    if (temp == NULL) {
+        joblist = nn;
+    } else {
+        while (temp->next != NULL) {
+            temp = temp->next;
+        } 
+        temp->next = nn;
+    }
+
+    nn = (JobList *)malloc(sizeof(JobList));
+    nn->jobname = strdup("ooooooo");
+    nn->pid = 69;
+    nn->next = NULL;
+    temp = joblist;
+    if (temp == NULL) {
+        joblist = nn;
+    } else {
+        while (temp->next != NULL) {
+            temp = temp->next;
+        } 
+        temp->next = nn;
+    }
+
+
+    temp = joblist;
+    int jc = 1;
+    if (temp == NULL) {
+        printf("No pending jobs!!\n");
+    } else {
+        while (temp != NULL) {
+            printf("%d\t%d\t%s\n", jc, temp->pid, temp->jobname);
+            temp = temp -> next;
+            jc++;
+        }
+    }
+    printf("Now deleting\n");
+
+    int i = 1, index = 3;
+    temp = joblist;
+    JobList *p = temp;
+    while (i < index) {
+        p = temp;
+        temp = temp->next;
+        i++;
+    }
+    p->next = temp->next;
+    temp->next = NULL;
+
+
+    temp = joblist;
+    jc = 1;
+    if (temp == NULL) {
+        printf("No pending jobs!!\n");
+    } else {
+        while (temp != NULL) {
+            printf("%d\t%d\t%s\n", jc, temp->pid, temp->jobname);
+            temp = temp -> next;
+            jc++;
+        }
+    }
+    
     return 0;
 }

@@ -1,5 +1,5 @@
 /**
- * @file shell.c
+ * @file bettershell.c
  * @author Ninad Barve 
  * @brief OS Course Assignment
  * @date 2023-01-20
@@ -39,9 +39,28 @@
 #define BUFFERSIZE 1024
 #define MICROBUFFER 16
 
+/*Jobs list data structure*/
+typedef struct JobList {
+    int pid;
+    char *jobname;
+    struct JobList *next;
+} JobList;
+
+JobList *joblist = NULL;
+JobList *last = NULL;
+void insert_job(JobList **joblist, int pid, char *jobname);
+void delete_job(JobList **joblist, int index);
+int get_pid_and_delete(JobList **joblist, int index, char *jobname);
+
+int job_count = 0; /*No of background jobs*/
+char jobname[BUFFERSIZE];
+
+
 /*Some global variables which need to be passed to signal handlers*/
-char prompt[BUFFERSIZE];
-int custom = 0;
+char prompt[BUFFERSIZE]; /*prompt which gets printed on newline*/
+int custom = 0; /*If the prompt is a custom one*/
+int signal_status; /*Signal status. Whether the signal was ctrl-z or c*/
+
 
 /*Utility function declarations*/
 int check_path(char **patharr, int path_count, char *cmd);
@@ -52,13 +71,14 @@ void execute(char *input, char *PATHS[], int path_count);
 void execute_cmd(char *input, char *PATHS[], int path_count);
 void execute_pipe(char *input, char *PATHS[], int path_count);
 /*Signal handling functions*/
-void ctrl_c_handler(int var);
+void sigint_handler(int var);
+void parent_sigint_handler(int var);
+
 
 
 int main()
 {
     /*Setting up all the signal handlers needed*/
-    signal(SIGINT, ctrl_c_handler);
 
     /*various char arrays to be used to store different strings*/
     char buffer[BUFFERSIZE], cwd[BUFFERSIZE], path[BUFFERSIZE], redfile[BUFFERSIZE], cmd[BUFFERSIZE];
@@ -71,6 +91,8 @@ int main()
     int status = 1; /*staus flag for exiting out of loop*/
     int red_flag = NOR; /*redirection flag*/
     
+    int proc_index;
+    
     char *PATHS[64], PATH[BUFFERSIZE];
     PATHS[0]="/usr/bin/";
     int path_count = 1;
@@ -81,12 +103,10 @@ int main()
     printf("%s%sWARNING%s: Default path set to /usr/bin. Adding new paths via PATH=newpath1:newpath2:... will delete existing paths\n", C_RED, BOLD, RESET);
 
     while (status) {
+        signal(SIGINT, sigint_handler);
+        signal(SIGTSTP, sigint_handler);
+
         /*for displaying the prompt if it is the cwd or a custom one*/
-        // if (custom == 0) {
-        //     getcwd(cwd, BUFFERSIZE);
-        //     strcpy(prompt, cwd);
-        // }    
-        // printf("%s%s%s%s$ ", C_GREEN, BOLD, prompt, RESET);
         print_prompt(custom, prompt);
         
         /*Getting the user command shell*/
@@ -214,36 +234,54 @@ int main()
             }
             printf("\n");
         }
+        /*Command to see a history of commands*/
         else if (strcmp(buffer, "history") == 0) {
             for (int h = 0; h < hist_count; h++) {
                 printf("%d\t%s\n", h+1, history[h]);
             }
         }
-        // else if (buffer[0] == '!') {
-        //     printf("Exclaimation1!!!!!\n");
-        //     if (strlen(buffer) != 1) {
-        //         if (buffer[1] == '!') {
-        //             strcpy(cmd, history[hist_count - 1]);
-        //             printf("%s\n", cmd);
-        //             execute(cmd, PATHS, path_count);
-        //             continue;
-        //         }
-        //         char *hnum = &(buffer[1]);
-        //         int h_num = atoi(hnum);
-        //         if (h_num > 0 && h_num < hist_count) {
-        //             strcpy(cmd, history[h_num - 1]);
-        //             printf("%s\n", cmd);
-        //             execute(cmd, PATHS, path_count);
-        //         }
-        //         else if (h_num < 0 && -1*h_num < hist_count) {
-        //             strcpy(cmd, history[hist_count + h_num]);
-        //             printf("%s\n", cmd);
-        //             execute(cmd, PATHS, path_count);
-        //         } else {
-        //             printf("%s%sError%s:Invalid command/syntax\n", C_RED, BOLD, RESET);
-        //         }
-        //     }
-        // }
+        /*Command to list all jobs moved to the background*/
+        else if (strcmp(buffer, "jobs") == 0) {
+            JobList *temp = joblist;
+            int jc = 1;
+            if (temp == NULL) {
+                printf("No pending jobs!!\n");
+            } else {
+                while (temp != NULL) {
+                    printf("%d\t%d\t%s\n", jc, temp->pid, temp->jobname);
+                    temp = temp -> next;
+                    jc++;
+                }
+            }
+        }
+        /*Bring background jobs to foreground*/
+        else if (strstr(buffer, "fg") != NULL) {
+            signal(SIGINT, parent_sigint_handler);
+            signal(SIGTSTP, parent_sigint_handler);
+            if (joblist == NULL) {
+                printf("%s%sError%s:No jobs left in background\n", C_RED, BOLD, RESET);
+            } else {
+                temp = &(buffer[4]);
+                proc_index = atoi(temp);
+                int jobid = get_pid_and_delete(&joblist, proc_index, jobname);
+                kill(jobid, SIGCONT);
+                waitpid(jobid, &signal_status, WUNTRACED);
+                if (signal_status != 0 && signal_status != 2) {
+                    insert_job(&joblist, jobid, jobname);
+                }
+            }
+        }
+        /*Run jobs in background*/
+        else if (strstr(buffer, "bg") != NULL) {
+            if (joblist == NULL) {
+                printf("%s%sError%s:No jobs left in background\n", C_RED, BOLD, RESET);
+            } else {
+                temp = &(buffer[4]);
+                proc_index = atoi(temp);
+                int jobid = get_pid_and_delete(&joblist, proc_index, jobname);
+                kill(jobid, SIGCONT);
+            }
+        }
         /*No special commands. Proceed to normal execution*/
         else {
             /*checking existence of any paths*/
@@ -264,6 +302,7 @@ int main()
 }
 
 /*The utility function definitions*/
+
 /**
  * @brief Find the correct path of executables
  *        Do this by iterating through PATH array and check if executable
@@ -331,16 +370,41 @@ void remove_leading_and_trailing_space(char **src) {
     return;
 }
 
+/**
+ * @brief Prints the prompt to stdout
+ * 
+ * @param custom if the prompt value is set by PS1
+ * @param prompt the string to be displayed on terminal
+ */
 void print_prompt(int custom, char *prompt) {
     char cwd[BUFFERSIZE];
     if (custom == 0) {
         getcwd(cwd, BUFFERSIZE);
         strcpy(prompt, cwd);
     }
-    printf("%s%s%s%s$ ", C_GREEN, BOLD, prompt, RESET);
+    char display[BUFFERSIZE];
+    strcpy(display, C_GREEN);
+    strcat(display, BOLD);
+    strcat(display, prompt);
+    strcat(display, RESET);
+    strcat(display, "$ ");
+    int len = strlen(display);
+    // printf("%s%s%s%s$ ", C_GREEN, BOLD, prompt, RESET);
+    write(1, display, len+1);
+    // free(display);
 }
 
 
+
+/*The executing functions*/
+
+/**
+ * @brief Execute the command in input
+ * 
+ * @param input the command
+ * @param PATHS all the environment paths
+ * @param path_count no of paths
+ */
 void execute(char *input, char *PATHS[], int path_count) {
     if (strstr(input, "|") != NULL) {
         /*Pipe handler function call*/
@@ -351,6 +415,13 @@ void execute(char *input, char *PATHS[], int path_count) {
     }
 }
 
+/**
+ * @brief Execute a normal command without pipes
+ * 
+ * @param input the command
+ * @param PATHS all the environment paths
+ * @param path_count no of paths
+ */
 void execute_cmd(char *input, char *PATHS[], int path_count) {
     /*Inside here means we are executing without pipe*/
     char *buffer = strdup(input);
@@ -439,10 +510,22 @@ void execute_cmd(char *input, char *PATHS[], int path_count) {
         /*exec syscall. The one executing all the normal commands of the shell*/
         execv(cmd, args);
     } else { 
-        wait(0);
+        signal(SIGINT, parent_sigint_handler);
+        signal(SIGTSTP, parent_sigint_handler);
+        waitpid(pid, &signal_status, WUNTRACED);
+        if (signal_status != 0 && signal_status != 2) {
+            insert_job(&joblist, pid, buffer);
+        }
     }
 }
 
+/**
+ * @brief The command with pipe present in it
+ * 
+ * @param input the command
+ * @param PATHS all the environment paths
+ * @param path_count no of paths
+ */
 void execute_pipe(char *input, char *PATHS[], int path_count) {
     /*If we are inside here, it means we already have a presence pf pipe here*/
     /*strtok modifies the string so copying input to a separate buffer*/
@@ -582,7 +665,12 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
             execv(cmd, args);
 
         } else {
-            wait(0);
+            signal(SIGINT, parent_sigint_handler);
+            signal(SIGTSTP, parent_sigint_handler);
+            waitpid(pid, &signal_status, WUNTRACED);
+            if (signal_status != 0 && signal_status != 2) {
+                insert_job(&joblist, pid, buffer);
+            }
             close(pfdarray[1]);
             prev_fd = pfdarray[0];
             c++;
@@ -594,9 +682,110 @@ void execute_pipe(char *input, char *PATHS[], int path_count) {
 }
 
 
-void ctrl_c_handler(int var) {
-    printf("\n");
+/*Signal handlers*/
+
+/**
+ * @brief SIGINT Ctrl-C handler
+ * 
+ * @param var 
+ */
+void sigint_handler(int var) {
+    write(1, "\n", 2);
     print_prompt(custom, prompt);
     return;
+}
+ 
+/**
+ * @brief SIGINT Ctrl C handler for parent process
+ * 
+ * @param var 
+ */
+void parent_sigint_handler(int var) {
+    write(1, "\n", 2);
+    return;
+}
+
+
+/*Linked list finctions*/
+
+/**
+ * @brief Insert node to the joblist
+ * 
+ * @param joblist 
+ * @param pid 
+ * @param jobname 
+ */
+void insert_job(JobList **joblist, int pid, char *jobname) {
+    JobList *nn = (JobList *)malloc(sizeof(JobList));
+    nn->jobname = strdup(jobname);
+    nn->pid = pid;
+    nn->next = NULL;
+    JobList *temp = *joblist;
+    if (temp == NULL) {
+        *joblist = nn;
+    } else {
+        while (temp->next != NULL) {
+            temp = temp->next;
+        } 
+        temp->next = nn;
+    }
+    return;
+}
+
+/**
+ * @brief Delete a job from the list
+ * 
+ * @param joblist 
+ * @param index 
+ */
+void delete_job(JobList **joblist, int index) {
+    int i = 1;
+    JobList *temp = *joblist;
+    JobList *p = temp;
+    while (i < index) {
+        p = temp;
+        temp = temp->next;
+        i++;
+    }
+    p->next = temp->next;
+    temp->next = NULL;
+    free(temp);
+    return;
+}
+
+/**
+ * @brief Get the pid and delete object
+ * 
+ * @param joblist 
+ * @param index 
+ * @param jobname 
+ * @return int 
+ */
+int get_pid_and_delete(JobList **joblist, int index, char *jobname) {
+    if (*joblist == NULL) {
+        return -1;
+    }
+
+    int i = 1, pid;
+    JobList *temp = *joblist;
+    if (temp->next == NULL) {
+        strcpy(jobname, temp->jobname);
+        pid = temp->pid;
+        free(temp);
+        *joblist = NULL;
+    } else {
+        JobList *p = temp;
+        while (i < index) {
+            p = temp;
+            temp = temp->next;
+            i++;
+        }
+        strcpy(jobname, temp->jobname);
+        pid = temp->pid;
+        p->next = temp->next;
+        temp->next = NULL;
+        free(temp);
+    }
+    return pid;
 }
 
