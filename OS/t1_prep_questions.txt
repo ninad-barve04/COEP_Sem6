@@ -1,0 +1,134 @@
+Q. List all the blocks/data-structures on the ext2 partition (e.g. superblock, group descriptor, block bitmap, directory data block, etc) with block size 4KB, that MAY be updated (means changed) when a file of size 8 KB is created.
+A. superblock, block group descriptor fot that block group, block and inode bitmaps, 
+
+
+Q. List any 3 problems of each of the block allocation schemes (continous, linked, indexed)
+A. Continuous: external fragmentation 
+   Linked: multiple disk seek and I/O cycles needed 
+   Indexed: index blocks can be cached, but data blocks throughout the memory Size limit for file
+
+
+
+Q. What is a device driver? Write some 7-8 points that correctly describe need, use, placement, particularities of device drivers.
+A. Device driver is code interacting with the device controller
+   
+
+What is a zombie process? How is it different from an orphan process?
+->
+Zombie: child has finished its execution but the parent hasn't called wait() on it
+Orphan: running child process whose parent has completed its execution 
+
+
+
+
+Which state changes are possible for a process, which changes are not possible?
+->
+Not possible: 
+1 new to any state other than ready
+2 ready to waiting or new
+3 running to new
+4 waiting to running or terminated 
+Possible:
+Rest all
+
+
+
+What is mkfs? what does it do? what are different options to mkfs and what do they mean?
+
+
+
+What is the purpose of the PCB? which are the necessary fields in the PCB?
+
+
+
+Write a C program that uses globals, local variables, static local variables, static global variables, and malloced memory. Compile it. Dump the object code file using objdump -S. Can you see in the output, the separation into stack, heap, text, etc?
+->
+Yes
+
+
+
+Which parts of a C program ((typedef, #define, #include, functions, local vars, statics, globals, #ifdef, ... ) etc occupy RAM when it's a process, and where (code, data, stack, ..)?
+
+
+
+Describe the role of CPU (MMU), kernel, compiler in the overall task of "memory management" for a process/program.
+->
+Notes 
+
+
+
+
+What is the difference between a named pipe and un-named pipe?
+->
+Named pipes can be created using mkfifo
+
+
+
+
+Describe the steps involved in resolving the path name /a/b/c on an ext2 filesystem.
+->
+Asg 2
+
+
+
+
+Suppose there is an ext2 partition with block size of 2KB. what is the maximum possible size of a file in kilobytes?
+
+
+
+
+Write a program that implements a pipe between two processes only (this is Shell assignment-2, first small part).
+->
+Done
+
+
+
+
+What are privilegd instructions? Why are they required? What is their relationship to 2 modes of CPU execution?
+
+
+
+Explain what happens in pre-processing, compilation and linking and loading.
+->
+Notes
+
+
+
+Why is the kernel called an event-drive program?
+
+
+
+What are the limitations of segmentation memory management scheme?
+
+
+
+How is the problem of external fragmentation solved?
+->
+Compaction
+
+
+
+Does paging suffer from fragmentation of any kind?
+
+
+
+in this program: int main() { int a[16], i; for(i = 0; ; i++) printf("%d\n", a[i]); } why does the program not segfault at a[16] or some more values?
+
+What is segmentation fault? why is it caused? who detects it and when? how is the process killed after segmentation fault?
+->
+Caused by illegal memory access 
+Mmu detects it's 
+
+
+
+
+What is the meaning of "core dumped"?
+
+
+
+What is voluntary context switch and non-voluntary context switch on Linux? Name 2 processes which have lot of non-voluntary context switches compared to voluntary.
+
+
+
+
+
