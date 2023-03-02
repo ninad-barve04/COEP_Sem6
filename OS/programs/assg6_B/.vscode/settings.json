@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "string.h": "c",
+        "ext2_fs.h": "c"
+    }
+}

@@ -23,35 +23,7 @@
     letter-spacing: 2px;
     font-size: 45px;
 }
-
-.w-fwd-button {
-    border: none;
-    color: #FFFFFF;
-    left: 76%;
-    position: fixed;
-    top: 40vh;
-    cursor: pointer;
-}
-
-.w-rev-button {
-    border: none;
-    color: #FFFFFF;
-    left: 20%;
-    position: fixed;
-    top: 40vh;
-    cursor: pointer;
-}
-
-
-.w-image {
-    width: 600px;
-}
-
-.w-controls {
-    justify-content: space-evenly;
-    display: flex;
-    margin: 10px 0;
-}
+ 
 
 .w-spacer{
     height:30px;
@@ -62,4 +34,19 @@
     display:block;
 }
 
+.w-text1{
+    font-size:16pt;
+    font-weight:500;
+}
+
+
+.w-text2{
+    font-size:10pt;
+    font-weight:200;
+}
+
+.w-text3{
+    font-size:14pt;
+    font-weight:300;
+}
 
